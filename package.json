@@ -1,0 +1,22 @@
+{
+  "name": "@envigored/projects-cards-sync",
+  "private": true,
+  "version": "0.0.1",
+  "description": "A GitHub Action to sync Project Cards with issues and pull requests",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "ncc build ./src/index.js -o dist"
+  },
+  "repository": "github:Envigored/projects-cards-sync",
+  "author": "Envigored",
+  "dependencies": {
+    "@actions/core": "^1.6.0",
+    "@octokit/action": "^3.18.0"
+  },
+  "devDependencies": {
+    "@apollo/client": "^3.5.10",
+    "@semantic-release/git": "^10.0.1",
+    "@vercel/ncc": "^0.33.3",
+    "semantic-release": "^19.0.2"
+  }
+}

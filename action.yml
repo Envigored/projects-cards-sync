@@ -1,0 +1,8 @@
+name: Envigored Projects sync
+description: "Sync issues/pull request status to Projects"
+branding:
+  icon: "box"
+  color: gray-dark
+runs:
+  using: "node16"
+  main: "dist/index.js"
