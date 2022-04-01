@@ -71,12 +71,11 @@ async function pullRequest() {
     const prLabelsId = filterLabels(prCurrentLabels, labelsToRemoveIds, labelsToAddIds)
 
     // Send the PR mutation.
-    octokit.graphql(prMutation, {prLabelsId, prNodeID})
-      .then(() => core.setOutput("Updated PR", 'Success'))
-      .catch((error) => core.debug(inspect(error)))
+    await octokit.graphql(prMutation, {prLabelsId, prNodeID})
+    message = message + `\n Update PR`
 
     // Walk our issues
-    issues.map((item) => {
+    issues.map(async (item) => {
       const {
         id: issueID,
         title,
@@ -124,16 +123,17 @@ async function pullRequest() {
           projectStatusId
         }
 
-        octokit.graphql(issueMutationWithCard, data)
-          .then(() => core.setOutput("Updated Issue", `Update ${title}`))
-          .catch((error) => core.debug(inspect(error)))
+        await octokit.graphql(issueMutationWithCard, data)
+        message = message + `\n Update ${title}`
       }
 
       if (!hasCard) {
-        octokit.graphql(issueMutation, {issueID, issueLabelsIds})
-          .then(() => core.setOutput("Updated Issue", `Update ${title}`))
-          .catch((error) => core.debug(inspect(error)))
+        await octokit.graphql(issueMutation, {issueID, issueLabelsIds})
+        message = message + `\n Update ${title}`
       }
+
+
+      core.setOutput("Updated", message)
     })
   } catch (error) {
     core.debug(inspect(error));

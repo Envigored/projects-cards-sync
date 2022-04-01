@@ -61894,26 +61894,13 @@ async function pullRequest() {
     let labelsToAddIds = []
     let labelsToRemoveIds = []
 
-
     const movedTo = core.getInput('move_to', {required: true})
-    const labelsToAdd = JSON.parse(core.getInput('labels_to_add'))
-    const labelsToRemove = JSON.parse(core.getInput('labels_to_remove'))
+    const labelsToAdd = JSON.parse(core.getInput('labels_to_add', {required: true}))
+    const labelsToRemove = JSON.parse(core.getInput('labels_to_remove', {required: true}))
     const newPullRequest = 'true' === core.getInput('new_item', {required: true})
     const projectStatusName = core.getInput('project_status_column', {required: true})
     const prNodeID = core.getInput('current_id', {required: true})
-    const projectID = Math.abs(core.getInput('project_id', {required: true}))
-    console.log(
-      {
-        movedTo,
-        labelsToAdd,
-        labelsToRemove,
-        newPullRequest,
-        prNodeID,
-        projectID
-      }
-    )
-
-    return;
+    const projectID = parseInt(core.getInput('project_id', {required: true}))
 
     const octokit = new Octokit();
 
@@ -61967,12 +61954,11 @@ async function pullRequest() {
     const prLabelsId = filterLabels(prCurrentLabels, labelsToRemoveIds, labelsToAddIds)
 
     // Send the PR mutation.
-    octokit.graphql(prMutation, {prLabelsId, prNodeID})
-      .then(() => core.setOutput("Updated PR", 'Success'))
-      .catch((error) => core.debug(inspect(error)))
+    await octokit.graphql(prMutation, {prLabelsId, prNodeID})
+    message = message + `\n Update PR`
 
     // Walk our issues
-    issues.map((item) => {
+    issues.map(async (item) => {
       const {
         id: issueID,
         title,
@@ -62020,16 +62006,17 @@ async function pullRequest() {
           projectStatusId
         }
 
-        octokit.graphql(issueMutationWithCard, data)
-          .then(() => core.setOutput("Updated Issue", `Update ${title}`))
-          .catch((error) => core.debug(inspect(error)))
+        await octokit.graphql(issueMutationWithCard, data)
+        message = message + `\n Update ${title}`
       }
 
       if (!hasCard) {
-        octokit.graphql(issueMutation, {issueID, issueLabelsIds})
-          .then(() => core.setOutput("Updated Issue", `Update ${title}`))
-          .catch((error) => core.debug(inspect(error)))
+        await octokit.graphql(issueMutation, {issueID, issueLabelsIds})
+        message = message + `\n Update ${title}`
       }
+
+
+      core.setOutput("Updated", message)
     })
   } catch (error) {
     core.debug(inspect(error));
