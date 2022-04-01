@@ -3,6 +3,35 @@ description: "Sync issues/pull request status to Projects"
 branding:
   icon: "box"
   color: gray-dark
+inputs:
+  type:
+    description: "Indicated is we are in a pull-request or issue"
+    required: true
+    default: "pull_request"
+  project_id:
+    description: "The Project(beta) numeric ID, found in the URL"
+    required: true
+  labels_to_add:
+    description: "Array with the labels name to add"
+    required: true
+    default: '[]'
+  labels_to_remove:
+    description: "Array with the labels name to remove"
+    required: true
+    default: '[]'
+  move_to:
+    description: "Desired column (todo,review,etc) to move the project card"
+    required: true
+  project_status_column:
+    description: "Column name"
+    required: true
+  new_item:
+    description: "Indicate if this is new item"
+    required: true
+    default: 'false'
+  current_id:
+    description: "Current node id of the pull-request or issue, github.event.(pull_request|issue).node_id"
+    required: true
 runs:
   using: "node16"
   main: "dist/index.js"
